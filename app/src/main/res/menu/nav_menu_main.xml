@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/id1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/main"
+            android:icon="@drawable/newsfeedicon"
+            android:title="Recette du jour"></item>
+        <item
+            android:id="@+id/favoris"
+            android:icon="@drawable/nav_favorite"
+            android:title="mes favoris"></item>
+        <item
+            android:id="@+id/addRecette"
+            android:icon="@drawable/nav_add_recette"
+            android:title="Ajouter une recette"></item>
+    </group>
+    <group
+        android:id="@+id/id2"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/logout"
+            android:icon="@drawable/nav_logout"
+            android:title="déconnexion"></item>
+    </group>
+</menu>

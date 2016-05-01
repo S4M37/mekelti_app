@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">Mekelti</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (required)</string>
+    <string name="action_sign_in">Se Connecter</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing email
+        completions."
+    </string>
+    <string name="navigation_drawer_open" />
+    <string name="navigation_drawer_close" />
+    <string name="loading">chargement ...</string>
+    <string name="server_error">Service introuvable, Veuillez réessayer ultérieurement</string>
+    <string name="title_server_error">Oups!</string>
+    <string name="empty_field">Veuillez completez les champs vides</string>
+    <string name="invalid_credential">Veuillez verifiez vos informations</string>
+    <string name="email_confirmation">Vous recevrez un mail de validation de votre email, veuillez le consultez pour activez votre compte</string>
+    <string name="inactive_account">Votre compte est inactive!</string>
+    <string name="invalid_user">Vous n\'etes pas encore inscris</string>
+    <string name="upload_image_option_recette">Choisissez une photo</string>
+    <string name="gellerie">galerie</string>
+    <string name="camera">camera</string>
+
+</resources>
