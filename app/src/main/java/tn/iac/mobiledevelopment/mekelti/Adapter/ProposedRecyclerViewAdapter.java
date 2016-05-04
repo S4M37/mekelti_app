@@ -1,12 +1,12 @@
 package tn.iac.mobiledevelopment.mekelti.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.daimajia.swipe.SwipeLayout;
@@ -18,21 +18,21 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import tn.iac.mobiledevelopment.mekelti.Model.UserFavoris;
+import tn.iac.mobiledevelopment.mekelti.Model.RecetteProposed;
 import tn.iac.mobiledevelopment.mekelti.R;
 import tn.iac.mobiledevelopment.mekelti.Utils.Utils;
 import tn.iac.mobiledevelopment.mekelti.Widget.CircleImageView;
 
 /**
- * Created by S4M37 on 01/05/2016.
+ * Created by S4M37 on 02/05/2016.
  */
-public class FavorisRecyclerAdapter extends RecyclerSwipeAdapter<FavorisRecyclerAdapter.ViewHolder> {
+public class ProposedRecyclerViewAdapter extends RecyclerSwipeAdapter<ProposedRecyclerViewAdapter.ViewHolder> {
 
-    private List<UserFavoris> list;
+    private List<RecetteProposed> list;
     private Context context;
     private int userId;
 
-    public FavorisRecyclerAdapter(Context context, List<UserFavoris> list, int userId) {
+    public ProposedRecyclerViewAdapter(Context context, List<RecetteProposed> list, int userId) {
         this.list = list;
         this.context = context;
         this.userId = userId;
@@ -40,27 +40,38 @@ public class FavorisRecyclerAdapter extends RecyclerSwipeAdapter<FavorisRecycler
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.favoris_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.proposed_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        final UserFavoris userFavoris = list.get(position);
-        holder.title.setText(userFavoris.getRecette().getLabel());
-        holder.descripton.setText(userFavoris.getRecette().getDescription());
-        holder.category.setText(userFavoris.getRecette().getType());
-        if (!userFavoris.getRecette().getImg().equals("")) {
-            holder.img.setImageUrl(userFavoris.getRecette().getImg());
+        final RecetteProposed recetteProposed = list.get(position);
+        holder.title.setText(recetteProposed.getRecette().getLabel());
+        holder.descripton.setText(recetteProposed.getRecette().getDescription());
+        holder.category.setText(recetteProposed.getRecette().getType());
+        if (!recetteProposed.getRecette().getImg().equals("")) {
+            holder.img.setImageUrl(recetteProposed.getRecette().getImg());
         } else {
             holder.img.setImageResource(R.drawable.ic_launcher);
-
         }
         if (holder.img.getDrawable() == null) {
             holder.img.setImageResource(R.drawable.ic_launcher);
         }
+        switch (recetteProposed.getValid()) {
+            case 0:
+                holder.imageValid.setImageResource(R.drawable.invalid);
+                break;
+            case 1:
+                holder.imageValid.setImageResource(R.drawable.valid);
+                break;
+            case 2:
+                holder.imageValid.setImageResource(R.drawable.refuser);
+                break;
+        }
+        holder.title.setText(recetteProposed.getRecette().getLabel());
+
         holder.swipeLayout.addDrag(SwipeLayout.DragEdge.Left, holder.itemView.findViewById(R.id.wrapper));
-        holder.title.setText(userFavoris.getRecette().getLabel());
         holder.swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener() {
             @Override
             public void onStartOpen(SwipeLayout layout) {
@@ -69,7 +80,7 @@ public class FavorisRecyclerAdapter extends RecyclerSwipeAdapter<FavorisRecycler
 
             @Override
             public void onOpen(SwipeLayout layout) {
-                removeFromFavoris(userFavoris.getId_Favoris());
+                deleteProposed(recetteProposed.getId_Proposed());
                 mItemManger.removeShownLayouts(holder.swipeLayout);
                 list.remove(position);
                 notifyItemRemoved(position);
@@ -98,17 +109,21 @@ public class FavorisRecyclerAdapter extends RecyclerSwipeAdapter<FavorisRecycler
 
             }
         });
-        if (!userFavoris.getRecette().getLink().equals("")) {
-            holder.swipeLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(userFavoris.getRecette().getLink()));
-                    //context.startActivity(browserIntent);
-                }
-            });
-        } else {
-            holder.swipeLayout.setOnClickListener(null);
-        }
+    }
+
+    private void deleteProposed(int proposedId) {
+        Call<ResponseBody> call = Utils.getRetrofitServices().deleteProposed(Utils.token, userId, proposedId);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d("responseCode", response.code() + "");
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -122,24 +137,27 @@ public class FavorisRecyclerAdapter extends RecyclerSwipeAdapter<FavorisRecycler
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        SwipeLayout swipeLayout;
+        private SwipeLayout swipeLayout;
         private CircleImageView img;
         private TextView descripton;
         private TextView category;
         private TextView title;
+        private ImageView imageValid;
 
         public ViewHolder(View itemView) {
             super(itemView);
-            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipper);
             img = (CircleImageView) itemView.findViewById(R.id.recette_image);
             descripton = (TextView) itemView.findViewById(R.id.recette_description);
             category = (TextView) itemView.findViewById(R.id.recette_category);
             title = (TextView) itemView.findViewById(R.id.recette_title);
+            imageValid = (ImageView) itemView.findViewById(R.id.recette_valid);
+            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipper);
+
         }
     }
 
     private void removeFromFavoris(int favorisId) {
-        Call<ResponseBody> call = Utils.getRetrofitServices().deleteUserFavoris(Utils.token,userId, favorisId);
+        Call<ResponseBody> call = Utils.getRetrofitServices().deleteUserFavoris(Utils.token, userId, favorisId);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

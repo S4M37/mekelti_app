@@ -1,17 +1,15 @@
 package tn.iac.mobiledevelopment.mekelti.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.daimajia.swipe.SwipeLayout;
 import com.google.gson.Gson;
 
 import org.json.JSONException;
@@ -24,25 +22,27 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import tn.iac.mobiledevelopment.mekelti.Activity.LoginActivity;
+import tn.iac.mobiledevelopment.mekelti.Fragment.LoginFragment;
 import tn.iac.mobiledevelopment.mekelti.Model.NewsFeed;
+import tn.iac.mobiledevelopment.mekelti.Model.User;
 import tn.iac.mobiledevelopment.mekelti.Model.UserFavoris;
 import tn.iac.mobiledevelopment.mekelti.R;
 import tn.iac.mobiledevelopment.mekelti.Utils.Utils;
 import tn.iac.mobiledevelopment.mekelti.Widget.CircleImageView;
 
 /**
- * Created by S4M37 on 01/05/2016.
+ * Created by S4M37 on 02/05/2016.
  */
-public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecyclerAdapter.ViewHolder> {
+public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAdapter.ViewHolder> {
 
-    private final int userId;
     private List<NewsFeed> list;
     private Context context;
+    private User user;
 
-    public NewsFeedRecyclerAdapter(Context context, List<NewsFeed> list, int userId) {
-        this.list = list;
+    public SearchRecyclerAdapter(Context context, User user) {
         this.context = context;
-        this.userId = userId;
+        this.user = user;
     }
 
     @Override
@@ -56,6 +56,7 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
         final NewsFeed newsFeed = list.get(position);
         holder.category.setText(newsFeed.getRecette().getType());
         holder.descripton.setText(newsFeed.getRecette().getDescription());
+        holder.title.setText(newsFeed.getRecette().getLabel());
         if (!newsFeed.getRecette().getImg().equals("")) {
             holder.img.setImageUrl(newsFeed.getRecette().getImg());
         } else {
@@ -64,7 +65,6 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
         if (holder.img.getDrawable() == null) {
             holder.img.setImageResource(R.drawable.ic_launcher);
         }
-        holder.title.setText(newsFeed.getRecette().getLabel());
         if (newsFeed.getFavoris() == 1) {
             holder.favoris.setImageResource(R.drawable.favoris_full);
         } else {
@@ -73,32 +73,39 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
         holder.favoris.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (list.get(position).getFavoris() == 1) {
-                    holder.favoris.setImageResource(R.drawable.favoris_empty);
-                    list.get(position).setFavoris(0);
-                    removeFromFavoris(newsFeed.getFavorisId());
+                if (user != null) {
+                    if (list.get(position).getFavoris() == 1) {
+                        holder.favoris.setImageResource(R.drawable.favoris_empty);
+                        list.get(position).setFavoris(0);
+                        removeFromFavoris(newsFeed.getFavorisId());
+                    } else {
+                        holder.favoris.setImageResource(R.drawable.favoris_full);
+                        list.get(position).setFavoris(1);
+                        addToFavoris(newsFeed.getRecette().getId_Recette(), position);
+                    }
                 } else {
-                    holder.favoris.setImageResource(R.drawable.favoris_full);
-                    list.get(position).setFavoris(1);
-                    addToFavoris(newsFeed.getRecette().getId_Recette(), position);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setMessage(context.getString(R.string.registration_request));
+                    builder.setPositiveButton("oui", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ((LoginActivity) context).showFragment(new LoginFragment());
+                            dialog.dismiss();
+                        }
+                    }).setNegativeButton("non", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    builder.create().show();
                 }
             }
         });
-        if (!newsFeed.getRecette().getLink().equals("")) {
-            holder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(newsFeed.getRecette().getLink()));
-                    context.startActivity(browserIntent);
-                }
-            });
-        } else {
-            holder.itemView.setOnClickListener(null);
-        }
     }
 
     private void addToFavoris(int recetteId, final int position) {
-        Call<ResponseBody> call = Utils.getRetrofitServices().addFavorisToUser(Utils.token,userId, recetteId);
+        Call<ResponseBody> call = Utils.getRetrofitServices().addFavorisToUser(Utils.token,user.getId_user(), recetteId);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
@@ -119,13 +126,12 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
         });
     }
 
+
     private void removeFromFavoris(int favorisId) {
-        Log.d("data", userId + " " + favorisId);
-        Call<ResponseBody> call = Utils.getRetrofitServices().deleteUserFavoris(Utils.token,userId, favorisId);
+        Call<ResponseBody> call = Utils.getRetrofitServices().deleteUserFavoris(Utils.token,user.getId_user(), favorisId);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.d("responseCode", response.code() + "");
             }
 
             @Override
@@ -137,11 +143,14 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
 
     @Override
     public int getItemCount() {
-        return list.size();
+        if (list != null) {
+            return list.size();
+        } else {
+            return 0;
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        SwipeLayout swipeLayout;
         private CircleImageView img;
         private TextView descripton;
         private TextView category;
@@ -150,7 +159,6 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
 
         public ViewHolder(View itemView) {
             super(itemView);
-            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.swipper);
             img = (CircleImageView) itemView.findViewById(R.id.recette_image);
             descripton = (TextView) itemView.findViewById(R.id.recette_description);
             category = (TextView) itemView.findViewById(R.id.recette_category);
@@ -158,4 +166,11 @@ public class NewsFeedRecyclerAdapter extends RecyclerView.Adapter<NewsFeedRecycl
             favoris = (ImageView) itemView.findViewById(R.id.recette_favoris);
         }
     }
+
+    public void swap(List<NewsFeed> list) {
+        this.list = null;
+        this.list = list;
+        notifyDataSetChanged();
+    }
 }
+

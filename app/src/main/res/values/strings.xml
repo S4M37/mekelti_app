@@ -26,5 +26,6 @@
     <string name="upload_image_option_recette">Choisissez une photo</string>
     <string name="gellerie">galerie</string>
     <string name="camera">camera</string>
+    <string name="registration_request">voulez-vous avoir un espace privé? inscrivez-vous alors ;)</string>
 
 </resources>

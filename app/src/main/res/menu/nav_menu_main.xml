@@ -5,19 +5,33 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/main"
+            android:checked="true"
             android:icon="@drawable/newsfeedicon"
             android:title="Recette du jour"></item>
+        <item
+            android:id="@+id/search"
+            android:icon="@drawable/nav_search"
+            android:title="Rechercher une recette"></item>
         <item
             android:id="@+id/favoris"
             android:icon="@drawable/nav_favorite"
             android:title="mes favoris"></item>
+    </group>
+
+    <group
+        android:id="@+id/id2"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/addRecette"
             android:icon="@drawable/nav_add_recette"
             android:title="Ajouter une recette"></item>
+        <item
+            android:id="@+id/proposed"
+            android:icon="@drawable/nav_proposed"
+            android:title="mes proposition"></item>
     </group>
     <group
-        android:id="@+id/id2"
+        android:id="@+id/id3"
         android:checkableBehavior="none">
         <item
             android:id="@+id/logout"

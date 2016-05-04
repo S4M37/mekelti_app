@@ -25,21 +25,20 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import tn.iac.mobiledevelopment.mekelti.Activity.MainActivity;
-import tn.iac.mobiledevelopment.mekelti.Adapter.FavorisRecyclerAdapter;
+import tn.iac.mobiledevelopment.mekelti.Adapter.NewsFeedRecyclerAdapter;
+import tn.iac.mobiledevelopment.mekelti.Model.NewsFeed;
 import tn.iac.mobiledevelopment.mekelti.Model.User;
-import tn.iac.mobiledevelopment.mekelti.Model.UserFavoris;
 import tn.iac.mobiledevelopment.mekelti.R;
 import tn.iac.mobiledevelopment.mekelti.Service.Connectivity;
-import tn.iac.mobiledevelopment.mekelti.Service.DialogFactory;
 import tn.iac.mobiledevelopment.mekelti.Utils.Utils;
 
 /**
- * Created by S4M37 on 01/05/2016.
+ * Created by S4M37 on 17/04/2016.
  */
-public class FragmentFavoris extends Fragment {
-    View rootView;
-    RecyclerView listFavoris;
-    ArrayList<UserFavoris> listFavorisItem;
+public class FragmentNewsFeed extends Fragment {
+    private View rootView;
+    RecyclerView listRecette;
+    ArrayList<NewsFeed> listRecetteItem;
     Button proposeButton;
     User user;
     ProgressDialog progressDialog;
@@ -48,45 +47,43 @@ public class FragmentFavoris extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = LayoutInflater.from(getContext()).inflate(R.layout.fragment_recettes, container, false);
+        rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        insializeView();
         user = ((MainActivity) getActivity()).getUser();
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getString(R.string.loading));
-        insializeView();
         insializeRecylcerView();
-        getFavoris();
+        getRecette();
         return rootView;
     }
 
-    private void getFavoris() {
+    private void getRecette() {
         if (!Connectivity.isOnline(getContext())) {
 
         } else {
             progressDialog.show();
-            Call<ResponseBody> call = Utils.getRetrofitServices().getUserFavoris(Utils.token, user.getId_user());
+            Call<ResponseBody> call = Utils.getRetrofitServices().getNewsFeed(Utils.token,user.getId_user());
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     try {
                         JSONObject jsonObject = new JSONObject(response.body().string());
                         JSONArray jsonArray = jsonObject.getJSONArray(Utils.TAG_ROOTE_RESPONSE);
-                        listFavorisItem = new ArrayList();
+                        listRecetteItem = new ArrayList();
                         Gson gson = new Gson();
                         for (int i = 0; i < jsonArray.length(); i++) {
-                            listFavorisItem.add(gson.fromJson(String.valueOf(jsonArray.get(i)), UserFavoris.class));
+                            listRecetteItem.add(gson.fromJson(String.valueOf(jsonArray.get(i)), NewsFeed.class));
                         }
-                        FavorisRecyclerAdapter favorisRecyclerAdapter = new FavorisRecyclerAdapter(getContext(), listFavorisItem, user.getId_user());
-                        listFavoris.setAdapter(favorisRecyclerAdapter);
+                        NewsFeedRecyclerAdapter newsFeedRecyclerAdapter = new NewsFeedRecyclerAdapter(getContext(), listRecetteItem, user.getId_user());
+                        listRecette.setAdapter(newsFeedRecyclerAdapter);
                     } catch (JSONException | IOException | NullPointerException e) {
                         e.printStackTrace();
-                        DialogFactory.showAlertDialog(getContext(), getString(R.string.server_error), getString(R.string.title_server_error));
                     }
                     progressDialog.dismiss();
                 }
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    DialogFactory.showAlertDialog(getContext(), getString(R.string.server_error), getString(R.string.title_server_error));
                     progressDialog.dismiss();
                 }
             });
@@ -94,10 +91,10 @@ public class FragmentFavoris extends Fragment {
     }
 
     private void insializeRecylcerView() {
-        listFavoris = (RecyclerView) rootView.findViewById(R.id.list_recette);
+        listRecette = (RecyclerView) rootView.findViewById(R.id.list_recette);
         layoutManager = new LinearLayoutManager(getContext());
-        listFavoris.setLayoutManager(layoutManager);
-        listFavoris.setHasFixedSize(false);
+        listRecette.setLayoutManager(layoutManager);
+        listRecette.setHasFixedSize(false);
     }
 
     private void insializeView() {
@@ -108,14 +105,5 @@ public class FragmentFavoris extends Fragment {
                 ((MainActivity) getActivity()).showFragment(new FragmentAddRecette());
             }
         });
-    }
-
-    public static FragmentFavoris newInstance() {
-
-        Bundle args = new Bundle();
-
-        FragmentFavoris fragment = new FragmentFavoris();
-        fragment.setArguments(args);
-        return fragment;
     }
 }

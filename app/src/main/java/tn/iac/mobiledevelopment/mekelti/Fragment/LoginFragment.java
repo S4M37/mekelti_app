@@ -89,7 +89,7 @@ public class LoginFragment extends Fragment {
                                     try {
                                         JSONObject jsonObject = new JSONObject(response.body().string());
                                         String token = jsonObject.getString("token");
-                                        Log.d("token", token);
+                                        CompteManager.saveToken(getContext(), "Bearer " + token);
                                         Gson gson = new Gson();
                                         User user = gson.fromJson(jsonObject.getString("user"), User.class);
                                         if (user.getValide() == 1) {

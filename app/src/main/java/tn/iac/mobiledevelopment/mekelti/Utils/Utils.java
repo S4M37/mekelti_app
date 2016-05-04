@@ -16,8 +16,10 @@ import tn.iac.mobiledevelopment.mekelti.Service.RetrofitServices;
  */
 public class Utils {
 
+    public static final String TAG_ACTION = "action";
     public static Retrofit retrofit;
     public static final String TAG_ROOTE_RESPONSE = "response";
+    public static String token = "";
 
     public static RetrofitServices getRetrofitServices() {
         Retrofit retrofit = new Retrofit.Builder()

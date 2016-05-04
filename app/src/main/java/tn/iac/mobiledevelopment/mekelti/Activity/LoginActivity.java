@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
-import tn.iac.mobiledevelopment.mekelti.Fragment.LoginFragment;
+import tn.iac.mobiledevelopment.mekelti.Fragment.SearchFragment;
 import tn.iac.mobiledevelopment.mekelti.R;
 import tn.iac.mobiledevelopment.mekelti.Service.CompteManager;
 
@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         } else {
-            showFragment(new LoginFragment());
+            showFragment(SearchFragment.newInstance());
         }// Set up the login form.
     }
 
@@ -38,10 +38,9 @@ public class LoginActivity extends AppCompatActivity {
             /*if (fragmentManager.getBackStackEntryCount() > 1)
                 fragmentManager.popBackStack(fragmentManager.getBackStackEntryAt(0).getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
             fragmentTransaction.addToBackStack(null);*/
+            fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         }
     }
-
-
 }
 

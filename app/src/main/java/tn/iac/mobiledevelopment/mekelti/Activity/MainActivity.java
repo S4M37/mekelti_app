@@ -16,10 +16,13 @@ import android.widget.TextView;
 
 import tn.iac.mobiledevelopment.mekelti.Fragment.FragmentAddRecette;
 import tn.iac.mobiledevelopment.mekelti.Fragment.FragmentFavoris;
-import tn.iac.mobiledevelopment.mekelti.Fragment.FragmentMain;
+import tn.iac.mobiledevelopment.mekelti.Fragment.FragmentNewsFeed;
+import tn.iac.mobiledevelopment.mekelti.Fragment.ProposedFragment;
+import tn.iac.mobiledevelopment.mekelti.Fragment.SearchFragment;
 import tn.iac.mobiledevelopment.mekelti.Model.User;
 import tn.iac.mobiledevelopment.mekelti.R;
 import tn.iac.mobiledevelopment.mekelti.Service.CompteManager;
+import tn.iac.mobiledevelopment.mekelti.Utils.Utils;
 
 /**
  * Created by S4M37 on 17/04/2016.
@@ -45,7 +48,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         insializeDrawer();
         insializeView();
         fragmentManager = getSupportFragmentManager();
-        showFragment(new FragmentMain());
+        showFragment(new FragmentNewsFeed());
+        Utils.token = CompteManager.getToken(this);
     }
 
     private void insializeView() {
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main:
-                showFragment(new FragmentMain());
+                showFragment(new FragmentNewsFeed());
                 break;
             case R.id.addRecette:
                 showFragment(new FragmentAddRecette());
@@ -91,6 +95,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.favoris:
                 showFragment(FragmentFavoris.newInstance());
+                break;
+            case R.id.proposed:
+                showFragment(new ProposedFragment());
+                break;
+            case R.id.search:
+                showFragment(SearchFragment.newInstance());
                 break;
         }
         closeDrawer();

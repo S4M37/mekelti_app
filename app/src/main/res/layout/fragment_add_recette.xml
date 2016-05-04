@@ -65,5 +65,6 @@
             android:background="@drawable/btn_primary_bg"
             android:text="proposer"
             android:textColor="@drawable/btn_primary_text_color" />
+        
     </LinearLayout>
 </android.support.v4.widget.NestedScrollView>
